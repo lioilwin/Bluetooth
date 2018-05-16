@@ -21,8 +21,9 @@ import win.lioil.bluetooth.Util;
 public class Bt {
     static final UUID SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     static final String SPP_TAG = "SPP_TAG";
-    private static final String FILE_TAG = "::FILE_TAG::"; //文件标志
-    private static final String FILE_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/bt/";
+    private static final String FILE_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/bluetooth/";
+    private static final int FLAG_MSG = 0;  //消息标记
+    private static final int FLAG_FILE = 1; //文件标记
 
     BluetoothSocket mSocket;
     private DataOutputStream mOut;
@@ -46,26 +47,29 @@ public class Bt {
             DataInputStream in = new DataInputStream(mSocket.getInputStream());
             isRead = true;
             while (isRead) { //死循环读取
-                String msg = in.readUTF();
-                if (!FILE_TAG.equals(msg)) {// 接收短消息
-                    notifyUI(Listener.MSG, "接收短消息：" + msg);
-                } else {// 接收文件
-                    Util.mkdirs(FILE_PATH);
-                    String fileName = in.readUTF(); //文件名
-                    long fileLen = in.readLong(); //文件长度
-                    notifyUI(Listener.MSG, "正在接收文件(" + fileName + ")...");
-                    // 读取文件内容
-                    long len = 0;
-                    int r;
-                    byte[] b = new byte[4 * 1024];
-                    FileOutputStream out = new FileOutputStream(FILE_PATH + fileName);
-                    while ((r = in.read(b)) != -1) {
-                        out.write(b, 0, r);
-                        len += r;
-                        if (len >= fileLen)
-                            break;
-                    }
-                    notifyUI(Listener.MSG, "文件接收完成(存放在:" + FILE_PATH + ")");
+                switch (in.readInt()) {
+                    case FLAG_MSG: //读取短消息
+                        String msg = in.readUTF();
+                        notifyUI(Listener.MSG, "接收短消息：" + msg);
+                        break;
+                    case FLAG_FILE: //读取文件
+                        Util.mkdirs(FILE_PATH);
+                        String fileName = in.readUTF(); //文件名
+                        long fileLen = in.readLong(); //文件长度
+                        notifyUI(Listener.MSG, "正在接收文件(" + fileName + ")...");
+                        // 读取文件内容
+                        long len = 0;
+                        int r;
+                        byte[] b = new byte[4 * 1024];
+                        FileOutputStream out = new FileOutputStream(FILE_PATH + fileName);
+                        while ((r = in.read(b)) != -1) {
+                            out.write(b, 0, r);
+                            len += r;
+                            if (len >= fileLen)
+                                break;
+                        }
+                        notifyUI(Listener.MSG, "文件接收完成(存放在:" + FILE_PATH + ")");
+                        break;
                 }
             }
         } catch (Throwable e) {
@@ -81,6 +85,7 @@ public class Bt {
             return;
         isSending = true;
         try {
+            mOut.writeInt(FLAG_MSG); //消息标记
             mOut.writeUTF(msg);
         } catch (Throwable e) {
             close();
@@ -103,7 +108,7 @@ public class Bt {
                     notifyUI(Listener.MSG, "正在发送文件(" + filePath + ")...");
                     FileInputStream in = new FileInputStream(filePath);
                     File file = new File(filePath);
-                    mOut.writeUTF(FILE_TAG); //文件标志(自定义)
+                    mOut.writeInt(FLAG_FILE); //文件标记
                     mOut.writeUTF(file.getName()); //文件名
                     mOut.writeLong(file.length()); //文件长度
                     int r;
