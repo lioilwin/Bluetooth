@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Bluetooth</string>
+    <string name="client">客户端</string>
+    <string name="server">服务端</string>
+</resources>
