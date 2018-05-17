@@ -1,4 +1,4 @@
-package win.lioil.bluetooth.bt;
+package win.lioil.bluetooth.util;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -12,11 +12,11 @@ import android.util.Log;
 /**
  * 监听蓝牙广播-各种状态
  */
-public class BtReceiver extends BroadcastReceiver {
-    private static final String TAG = BtReceiver.class.getSimpleName();
+public class BluetoothReceiver extends BroadcastReceiver {
+    private static final String TAG = BluetoothReceiver.class.getSimpleName();
     private final Listener mListener;
 
-    public BtReceiver(Context cxt, Listener listener) {
+    public BluetoothReceiver(Context cxt, Listener listener) {
         mListener = listener;
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);//蓝牙开关状态

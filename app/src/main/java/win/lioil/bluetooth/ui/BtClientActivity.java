@@ -14,28 +14,19 @@ import android.widget.TextView;
 import java.io.File;
 
 import win.lioil.bluetooth.R;
-import win.lioil.bluetooth.Util;
-import win.lioil.bluetooth.bt.Bt;
+import win.lioil.bluetooth.util.Util;
+import win.lioil.bluetooth.bt.BtBase;
 import win.lioil.bluetooth.bt.BtClient;
-import win.lioil.bluetooth.bt.BtReceiver;
+import win.lioil.bluetooth.util.BluetoothReceiver;
 
-public class BtClientActivity extends Activity implements Bt.Listener, BtReceiver.Listener {
+public class BtClientActivity extends Activity implements BtBase.Listener, BluetoothReceiver.Listener, DevAdapter.Listener {
     private TextView mTips;
     private EditText mInputMsg;
     private EditText mInputFile;
     private TextView mLogs;
-
-    private BtReceiver mBtReceiver;
+    private BluetoothReceiver mBluetoothReceiver;
+    private final DevAdapter mDevAdapter = new DevAdapter(this);
     private final BtClient mClient = new BtClient(this);
-    private final BtClientAdapter mBtClientAdapter = new BtClientAdapter(new BtClientAdapter.CallBack() {
-        @Override
-        public void onItemClick(BluetoothDevice dev) {
-            if (mClient.isConnected(dev))
-                return;
-            mClient.connect(dev);
-            mTips.setText("正在连接...");
-        }
-    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,24 +34,37 @@ public class BtClientActivity extends Activity implements Bt.Listener, BtReceive
         setContentView(R.layout.activity_btclient);
         RecyclerView rv = findViewById(R.id.rv_bt);
         rv.setLayoutManager(new LinearLayoutManager(this));
-        rv.setAdapter(mBtClientAdapter);
+        rv.setAdapter(mDevAdapter);
         mTips = findViewById(R.id.tv_tips);
         mInputMsg = findViewById(R.id.input_msg);
         mInputFile = findViewById(R.id.input_file);
         mLogs = findViewById(R.id.tv_log);
-        mBtReceiver = new BtReceiver(this, this);//注册蓝牙广播
+        mBluetoothReceiver = new BluetoothReceiver(this, this);//注册蓝牙广播
         BluetoothAdapter.getDefaultAdapter().startDiscovery();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(mBtReceiver);
+        unregisterReceiver(mBluetoothReceiver);
         mClient.close();
     }
 
+    @Override
+    public void onItemClick(BluetoothDevice dev) {
+        if (mClient.isConnected(dev))
+            return;
+        mClient.connect(dev);
+        mTips.setText("正在连接...");
+    }
+
+    @Override
+    public void foundDev(BluetoothDevice dev) {
+        mDevAdapter.add(dev);
+    }
+
     public void refresh(View view) {
-        mBtClientAdapter.refresh();//重新搜索蓝牙
+        mDevAdapter.refresh();//刷新发现设备
     }
 
     public void sendMsg(View view) {
@@ -86,24 +90,19 @@ public class BtClientActivity extends Activity implements Bt.Listener, BtReceive
     }
 
     @Override
-    public void foundDev(BluetoothDevice dev) {
-        mBtClientAdapter.add(dev);
-    }
-
-    @Override
     public void socketNotify(int state, final Object obj) {
         String msg = null;
         switch (state) {
-            case Bt.Listener.CONNECTED:
+            case BtBase.Listener.CONNECTED:
                 BluetoothDevice dev = (BluetoothDevice) obj;
                 msg = String.format("与%s(%s)连接成功", dev.getName(), dev.getAddress());
                 mTips.setText(msg);
                 break;
-            case Bt.Listener.DISCONNECTED:
+            case BtBase.Listener.DISCONNECTED:
                 msg = "连接断开";
                 mTips.setText(msg);
                 break;
-            case Bt.Listener.MSG:
+            case BtBase.Listener.MSG:
                 msg = String.format("\n%s", obj);
                 mLogs.append(msg);
                 break;

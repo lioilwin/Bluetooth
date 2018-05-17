@@ -13,32 +13,32 @@ import java.io.FileOutputStream;
 import java.util.UUID;
 
 import win.lioil.bluetooth.MainAPP;
-import win.lioil.bluetooth.Util;
+import win.lioil.bluetooth.util.Util;
 
 /**
- * 客户端和服务端公共部分，主要用于管理socket
+ * 客户端和服务端的基类，用于管理socket长连接
  */
-public class Bt {
+public class BtBase {
     static final UUID SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-    static final String SPP_TAG = "SPP_TAG";
     private static final String FILE_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/bluetooth/";
     private static final int FLAG_MSG = 0;  //消息标记
     private static final int FLAG_FILE = 1; //文件标记
 
-    BluetoothSocket mSocket;
+    private BluetoothSocket mSocket;
     private DataOutputStream mOut;
     private Listener mListener;
     private boolean isRead;
     private boolean isSending;
 
-    Bt(Listener listener) {
+    BtBase(Listener listener) {
         mListener = listener;
     }
 
     /**
-     * 循环接收数据(若没有数据，则阻塞等待)
+     * 循环读取对方数据(若没有数据，则阻塞等待)
      */
-    void loopRead() {
+    void loopRead(BluetoothSocket socket) {
+        mSocket = socket;
         try {
             if (!mSocket.isConnected())
                 mSocket.connect();
@@ -56,7 +56,7 @@ public class Bt {
                         Util.mkdirs(FILE_PATH);
                         String fileName = in.readUTF(); //文件名
                         long fileLen = in.readLong(); //文件长度
-                        notifyUI(Listener.MSG, "正在接收文件(" + fileName + ")...");
+                        notifyUI(Listener.MSG, "正在接收文件(" + fileName + ")····················");
                         // 读取文件内容
                         long len = 0;
                         int r;
@@ -105,7 +105,7 @@ public class Bt {
             @Override
             public void run() {
                 try {
-                    notifyUI(Listener.MSG, "正在发送文件(" + filePath + ")...");
+                    notifyUI(Listener.MSG, "正在发送文件(" + filePath + ")····················");
                     FileInputStream in = new FileInputStream(filePath);
                     File file = new File(filePath);
                     mOut.writeInt(FLAG_FILE); //文件标记
@@ -125,6 +125,9 @@ public class Bt {
         });
     }
 
+    /**
+     * 关闭Socket连接
+     */
     public void close() {
         try {
             isRead = false;
@@ -135,6 +138,9 @@ public class Bt {
         }
     }
 
+    /**
+     * 当前设备与指定设备是否连接
+     */
     public boolean isConnected(BluetoothDevice dev) {
         boolean connected = (mSocket != null && mSocket.isConnected());
         if (dev == null)

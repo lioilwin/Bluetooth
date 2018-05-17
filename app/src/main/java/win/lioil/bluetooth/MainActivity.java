@@ -1,4 +1,4 @@
-package win.lioil.bluetooth.ui;
+package win.lioil.bluetooth;
 
 import android.Manifest;
 import android.app.Activity;
@@ -9,8 +9,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 
-import win.lioil.bluetooth.R;
-import win.lioil.bluetooth.Util;
+import win.lioil.bluetooth.ui.BtClientActivity;
+import win.lioil.bluetooth.ui.BtServerActivity;
+import win.lioil.bluetooth.util.Util;
 
 public class MainActivity extends Activity {
 
@@ -42,11 +43,11 @@ public class MainActivity extends Activity {
         }
     }
 
-    public void sendMsg(View view) {
+    public void client(View view) {
         startActivity(new Intent(this, BtClientActivity.class));
     }
 
-    public void receive(View view) {
+    public void server(View view) {
         startActivity(new Intent(this, BtServerActivity.class));
     }
 }

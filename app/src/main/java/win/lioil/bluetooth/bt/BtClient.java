@@ -1,13 +1,14 @@
 package win.lioil.bluetooth.bt;
 
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 
-import win.lioil.bluetooth.Util;
+import win.lioil.bluetooth.util.Util;
 
 /**
  * 客户端，与服务端建立长连接
  */
-public class BtClient extends Bt {
+public class BtClient extends BtBase {
     public BtClient(Listener listener) {
         super(listener);
     }
@@ -15,12 +16,13 @@ public class BtClient extends Bt {
     public void connect(BluetoothDevice dev) {
         close();
         try {
-            mSocket = dev.createInsecureRfcommSocketToServiceRecord(SPP_UUID); //明文传输，无需配对
 //            mSocket = dev.createRfcommSocketToServiceRecord(SPP_UUID); //加密传输，必须配对
-            Util.EXECUTOR.execute(new Runnable() {//子线程循环读取
+            final BluetoothSocket socket = dev.createInsecureRfcommSocketToServiceRecord(SPP_UUID); //明文传输，无需配对
+            // 开启子线程
+            Util.EXECUTOR.execute(new Runnable() {
                 @Override
                 public void run() {
-                    loopRead();
+                    loopRead(socket); //循环读取
                 }
             });
         } catch (Throwable e) {

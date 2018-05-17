@@ -11,11 +11,11 @@ import android.widget.TextView;
 import java.io.File;
 
 import win.lioil.bluetooth.R;
-import win.lioil.bluetooth.Util;
-import win.lioil.bluetooth.bt.Bt;
+import win.lioil.bluetooth.util.Util;
+import win.lioil.bluetooth.bt.BtBase;
 import win.lioil.bluetooth.bt.BtServer;
 
-public class BtServerActivity extends Activity implements Bt.Listener {
+public class BtServerActivity extends Activity implements BtBase.Listener {
     private TextView mTips;
     private EditText mInputMsg;
     private EditText mInputFile;
@@ -31,7 +31,6 @@ public class BtServerActivity extends Activity implements Bt.Listener {
         mInputFile = findViewById(R.id.input_file);
         mLogs = findViewById(R.id.tv_log);
         mServer = new BtServer(this);
-        mServer.listen();
     }
 
     @Override
@@ -66,18 +65,18 @@ public class BtServerActivity extends Activity implements Bt.Listener {
     public void socketNotify(int state, final Object obj) {
         String msg = null;
         switch (state) {
-            case Bt.Listener.CONNECTED:
+            case BtBase.Listener.CONNECTED:
                 BluetoothDevice dev = (BluetoothDevice) obj;
                 msg = String.format("与%s(%s)连接成功", dev.getName(), dev.getAddress());
                 mTips.setText(msg);
                 break;
-            case Bt.Listener.DISCONNECTED:
+            case BtBase.Listener.DISCONNECTED:
                 if (!isFinishing())
                     mServer.listen();
                 msg = "连接断开,正在重新监听...";
                 mTips.setText(msg);
                 break;
-            case Bt.Listener.MSG:
+            case BtBase.Listener.MSG:
                 msg = String.format("\n%s", obj);
                 mLogs.append(msg);
                 break;

@@ -16,13 +16,13 @@ import java.util.Set;
 
 import win.lioil.bluetooth.R;
 
-public class BtClientAdapter extends RecyclerView.Adapter<BtClientAdapter.VH> {
-    private static final String TAG = BtClientAdapter.class.getSimpleName();
+public class DevAdapter extends RecyclerView.Adapter<DevAdapter.VH> {
+    private static final String TAG = DevAdapter.class.getSimpleName();
     private final List<BluetoothDevice> mDevices = new ArrayList<>();
-    private final CallBack mCallBack;
+    private final Listener mListener;
 
-    BtClientAdapter(CallBack callBack) {
-        mCallBack = callBack;
+    DevAdapter(Listener listener) {
+        mListener = listener;
         addBound();
     }
 
@@ -35,7 +35,7 @@ public class BtClientAdapter extends RecyclerView.Adapter<BtClientAdapter.VH> {
     @NonNull
     @Override
     public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_bt, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_dev, parent, false);
         return new VH(view);
     }
 
@@ -70,27 +70,27 @@ public class BtClientAdapter extends RecyclerView.Adapter<BtClientAdapter.VH> {
         notifyDataSetChanged();
     }
 
-    class VH extends RecyclerView.ViewHolder {
+    class VH extends RecyclerView.ViewHolder implements View.OnClickListener {
         final TextView name;
         final TextView address;
 
         VH(final View itemView) {
             super(itemView);
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int pos = getAdapterPosition();
-                    Log.d(TAG, "onClick, getAdapterPosition=" + pos);
-                    if (pos >= 0 && pos < mDevices.size())
-                        mCallBack.onItemClick(mDevices.get(pos));
-                }
-            });
+            itemView.setOnClickListener(this);
             name = itemView.findViewById(R.id.name);
-            address = itemView.findViewById(R.id.addr);
+            address = itemView.findViewById(R.id.address);
+        }
+
+        @Override
+        public void onClick(View v) {
+            int pos = getAdapterPosition();
+            Log.d(TAG, "onClick, getAdapterPosition=" + pos);
+            if (pos >= 0 && pos < mDevices.size())
+                mListener.onItemClick(mDevices.get(pos));
         }
     }
 
-    public interface CallBack {
+    public interface Listener {
         void onItemClick(BluetoothDevice dev);
     }
 }
