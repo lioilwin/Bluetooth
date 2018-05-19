@@ -13,10 +13,15 @@ public class BtClient extends BtBase {
         super(listener);
     }
 
+    /**
+     * 与远端设备建立长连接
+     *
+     * @param dev 远端设备
+     */
     public void connect(BluetoothDevice dev) {
         close();
         try {
-//            mSocket = dev.createRfcommSocketToServiceRecord(SPP_UUID); //加密传输，必须配对
+            // final BluetoothSocket socket = dev.createRfcommSocketToServiceRecord(SPP_UUID); //加密传输，会自动执行配对(系统UI弹出配对码)
             final BluetoothSocket socket = dev.createInsecureRfcommSocketToServiceRecord(SPP_UUID); //明文传输，无需配对
             // 开启子线程
             Util.EXECUTOR.execute(new Runnable() {

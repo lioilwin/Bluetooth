@@ -24,7 +24,7 @@ public class BtServer extends BtBase {
     public void listen() {
         try {
             BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-//            mSSocket = adapter.listenUsingRfcommWithServiceRecord(TAG, SPP_UUID); //加密传输，必须配对
+//            mSSocket = adapter.listenUsingRfcommWithServiceRecord(TAG, SPP_UUID); //加密传输，会自动执行配对
             mSSocket = adapter.listenUsingInsecureRfcommWithServiceRecord(TAG, SPP_UUID); //明文传输，无需配对
             // 开启子线程
             Util.EXECUTOR.execute(new Runnable() {

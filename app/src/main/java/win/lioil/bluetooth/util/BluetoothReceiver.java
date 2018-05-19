@@ -1,5 +1,6 @@
 package win.lioil.bluetooth.util;
 
+import android.bluetooth.BluetoothA2dp;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothHeadset;
@@ -28,8 +29,9 @@ public class BluetoothReceiver extends BroadcastReceiver {
         filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);//设备建立连接
         filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);//设备断开连接
 
-        filter.addAction(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED); //连接状态
-        filter.addAction(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED); //蓝牙耳机的连接状态
+        filter.addAction(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED); //BluetoothAdapter连接状态
+        filter.addAction(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED); //BluetoothHeadset连接状态
+        filter.addAction(BluetoothA2dp.ACTION_CONNECTION_STATE_CHANGED); //BluetoothA2dp连接状态
         cxt.registerReceiver(this, filter);
     }
 
@@ -75,6 +77,11 @@ public class BluetoothReceiver extends BroadcastReceiver {
                 Log.i(TAG, "BluetoothDevice: " + dev.getName() + ", " + dev.getAddress());
                 break;
             case BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED:
+                dev = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                Log.i(TAG, "STATE: " + intent.getIntExtra(BluetoothHeadset.EXTRA_STATE, 0));
+                Log.i(TAG, "BluetoothDevice: " + dev.getName() + ", " + dev.getAddress());
+                break;
+            case BluetoothA2dp.ACTION_CONNECTION_STATE_CHANGED:
                 dev = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 Log.i(TAG, "STATE: " + intent.getIntExtra(BluetoothHeadset.EXTRA_STATE, 0));
                 Log.i(TAG, "BluetoothDevice: " + dev.getName() + ", " + dev.getAddress());
