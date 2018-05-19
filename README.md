@@ -1,5 +1,8 @@
 # Android 经典蓝牙(Classic Bluetooth)和低功耗蓝牙(BLE)
 
+## 1.经典蓝牙(Classic Bluetooth)-建立长连接-收发短消息/文件(简易聊天)
+![client](png/client.png) ![server](png/server.png)
+
 参考: https://developer.android.com/guide/topics/connectivity/bluetooth
 
 ## 一.蓝牙版本介绍
