@@ -6,29 +6,60 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/tv_bt"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="client"
-        android:text="@string/client"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.325"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.498" />
+        android:gravity="center"
+        android:text="@string/bt"
+        android:textStyle="bold" />
 
     <Button
-        android:layout_width="wrap_content"
+        android:id="@+id/btn_bt_client"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="server"
-        android:text="@string/server"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.678"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.498" />
+        android:onClick="btClient"
+        android:text="@string/bt_client"
+        app:layout_constraintTop_toBottomOf="@+id/tv_bt" />
 
+    <Button
+        android:id="@+id/btn_bt_server"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="btServer"
+        android:text="@string/bt_server"
+        app:layout_constraintTop_toBottomOf="@+id/btn_bt_client" />
+
+    <View
+        android:id="@+id/line2"
+        android:layout_width="match_parent"
+        android:layout_height="0.6dp"
+        android:layout_marginTop="64dp"
+        android:background="#000"
+        app:layout_constraintTop_toBottomOf="@+id/btn_bt_server" />
+
+    <TextView
+        android:id="@+id/tv_ble"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/ble"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@+id/line2" />
+
+    <Button
+        android:id="@+id/btn_ble_client"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="bleClient"
+        android:text="@string/ble_client"
+        app:layout_constraintTop_toBottomOf="@+id/tv_ble" />
+
+    <Button
+        android:id="@+id/btn_ble_server"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="bleServer"
+        android:text="@string/ble_server"
+        app:layout_constraintTop_toBottomOf="@+id/btn_ble_client" />
 </android.support.constraint.ConstraintLayout>

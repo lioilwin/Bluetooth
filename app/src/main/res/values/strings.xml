@@ -1,5 +1,14 @@
 <resources>
     <string name="app_name">Bluetooth</string>
-    <string name="client">客户端</string>
-    <string name="server">服务端</string>
+    <string name="bt_client">BT客户端</string>
+    <string name="bt_server">BT服务端</string>
+    <string name="ble_client">BLE客户端(主设备/中心设备)</string>
+    <string name="ble_server">BLE服务端(从设备/外围设备)</string>
+    <string name="bt">经典蓝牙(BT)</string>
+    <string name="ble">低功耗蓝牙(BLE)</string>
+    <string name="reScan">重新扫描</string>
+    <string name="read">读取</string>
+    <string name="setNotify">设置通知</string>
+    <string name="max_byte">最多20字节</string>
+    <string name="write">写入</string>
 </resources>

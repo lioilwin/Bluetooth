@@ -1,4 +1,4 @@
-package win.lioil.bluetooth.ui;
+package win.lioil.bluetooth.bt;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -16,12 +16,12 @@ import java.util.Set;
 
 import win.lioil.bluetooth.R;
 
-public class DevAdapter extends RecyclerView.Adapter<DevAdapter.VH> {
-    private static final String TAG = DevAdapter.class.getSimpleName();
+public class BtDevAdapter extends RecyclerView.Adapter<BtDevAdapter.VH> {
+    private static final String TAG = BtDevAdapter.class.getSimpleName();
     private final List<BluetoothDevice> mDevices = new ArrayList<>();
     private final Listener mListener;
 
-    DevAdapter(Listener listener) {
+    BtDevAdapter(Listener listener) {
         mListener = listener;
         addBound();
     }
@@ -61,7 +61,7 @@ public class DevAdapter extends RecyclerView.Adapter<DevAdapter.VH> {
         notifyDataSetChanged();
     }
 
-    public void refresh() {
+    public void reScan() {
         mDevices.clear();
         addBound();
         BluetoothAdapter bt = BluetoothAdapter.getDefaultAdapter();

@@ -5,25 +5,19 @@
     android:orientation="vertical"
     android:padding="2dp">
 
-    <LinearLayout
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:onClick="reScan"
+        android:text="@string/reScan" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_bt"
         android:layout_width="match_parent"
         android:layout_height="186dp"
         android:background="@drawable/stroke"
-        android:orientation="vertical"
-        android:padding="4dp">
-
-        <Button
-            android:id="@+id/button2"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:onClick="refresh"
-            android:text="刷新(发现设备)" />
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_bt"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
+        android:padding="2dp" />
 
     <TextView
         android:id="@+id/tv_tips"

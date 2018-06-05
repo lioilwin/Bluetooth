@@ -5,12 +5,14 @@
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="true" />
 
     <application
         android:name=".MainAPP"
@@ -32,14 +34,22 @@
         </activity>
 
         <activity
-            android:name=".ui.BtClientActivity"
-            android:label="@string/client"
+            android:name=".bt.BtClientActivity"
+            android:label="@string/bt_client"
             android:windowSoftInputMode="stateAlwaysHidden|adjustPan" />
 
         <activity
-            android:name=".ui.BtServerActivity"
-            android:label="@string/server"
+            android:name=".bt.BtServerActivity"
+            android:label="@string/bt_server"
             android:windowSoftInputMode="stateAlwaysHidden" />
+
+        <activity
+            android:name=".ble.BleClientActivity"
+            android:label="@string/ble_client" />
+
+        <activity
+            android:name=".ble.BleServerActivity"
+            android:label="@string/ble_server" />
 
     </application>
 
