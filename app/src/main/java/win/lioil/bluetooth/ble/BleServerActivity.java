@@ -32,8 +32,8 @@ import win.lioil.bluetooth.util.Util;
  */
 public class BleServerActivity extends Activity {
     public static final UUID UUID_SERVICE = UUID.fromString("10000000-0000-0000-0000-000000000000"); //自定义UUID
-    public static final UUID UUID_CHAR_READ = UUID.fromString("11000000-0000-0000-0000-000000000000");
-    public static final UUID UUID_DESC = UUID.fromString("11100000-0000-0000-0000-000000000000");
+    public static final UUID UUID_CHAR_READ_NOTIFY = UUID.fromString("11000000-0000-0000-0000-000000000000");
+    public static final UUID UUID_DESC_NOTITY = UUID.fromString("11100000-0000-0000-0000-000000000000");
     public static final UUID UUID_CHAR_WRITE = UUID.fromString("12000000-0000-0000-0000-000000000000");
     private static final String TAG = BleServerActivity.class.getSimpleName();
     private TextView mTips;
@@ -102,20 +102,22 @@ public class BleServerActivity extends Activity {
             mBluetoothGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, value);// 响应客户端
             logTv("客户端写入Descriptor[" + descriptor.getUuid() + "]:\n" + valueStr);
 
-            // 通知客户端Characteristic变化(简单模拟，实际上应该用List保存客户端设备，以后真的变化再逐一通知)
-            final BluetoothGattCharacteristic characteristic = descriptor.getCharacteristic();
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    for (int i = 0; i < 5; i++) {
-                        String response = "CHAR_" + (int) (Math.random() * 100); //模拟数据
-                        characteristic.setValue(response);
-                        mBluetoothGattServer.notifyCharacteristicChanged(device, characteristic, false);
-                        logTv("通知客户端改变Characteristic[" + characteristic.getUuid() + "]:\n" + response);
-                        SystemClock.sleep(1000);
+            // 简单模拟通知客户端Characteristic变化
+            if (Arrays.toString(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE).equals(valueStr)) { //是否开启通知
+                final BluetoothGattCharacteristic characteristic = descriptor.getCharacteristic();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (int i = 0; i < 5; i++) {
+                            SystemClock.sleep(3000);
+                            String response = "CHAR_" + (int) (Math.random() * 100); //模拟数据
+                            characteristic.setValue(response);
+                            mBluetoothGattServer.notifyCharacteristicChanged(device, characteristic, false);
+                            logTv("通知客户端改变Characteristic[" + characteristic.getUuid() + "]:\n" + response);
+                        }
                     }
-                }
-            });
+                }).start();
+            }
         }
 
         @Override
@@ -146,8 +148,8 @@ public class BleServerActivity extends Activity {
         // ============启动BLE蓝牙广播(广告) =================================================================================
         //广播设置(必须)
         AdvertiseSettings settings = new AdvertiseSettings.Builder()
-                .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_BALANCED) //广播模式: 低功耗,平衡,低延迟
-                .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM) //发射功率级别: 极低,低,中,高
+                .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY) //广播模式: 低功耗,平衡,低延迟
+                .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_HIGH) //发射功率级别: 极低,低,中,高
                 .setConnectable(true) //能否连接,广播分为可连接广播和不可连接广播
                 .build();
         //广播数据(必须，广播启动就会发送)
@@ -169,9 +171,9 @@ public class BleServerActivity extends Activity {
         // =============启动蓝牙服务端=====================================================================================
         BluetoothGattService service = new BluetoothGattService(UUID_SERVICE, BluetoothGattService.SERVICE_TYPE_PRIMARY);
         //添加可读+通知characteristic
-        BluetoothGattCharacteristic characteristicRead = new BluetoothGattCharacteristic(UUID_CHAR_READ,
+        BluetoothGattCharacteristic characteristicRead = new BluetoothGattCharacteristic(UUID_CHAR_READ_NOTIFY,
                 BluetoothGattCharacteristic.PROPERTY_READ | BluetoothGattCharacteristic.PROPERTY_NOTIFY, BluetoothGattCharacteristic.PERMISSION_READ);
-        characteristicRead.addDescriptor(new BluetoothGattDescriptor(UUID_DESC, BluetoothGattCharacteristic.PERMISSION_WRITE));
+        characteristicRead.addDescriptor(new BluetoothGattDescriptor(UUID_DESC_NOTITY, BluetoothGattCharacteristic.PERMISSION_WRITE));
         service.addCharacteristic(characteristicRead);
         //添加可写characteristic
         BluetoothGattCharacteristic characteristicWrite = new BluetoothGattCharacteristic(UUID_CHAR_WRITE,

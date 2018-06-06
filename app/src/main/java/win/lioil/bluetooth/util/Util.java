@@ -19,11 +19,12 @@ public class Util {
     }
 
     private static void show(Context context, String txt, int duration) {
-        if (sToastWRF == null || sToastWRF.get() == null)
-            sToastWRF = new WeakReference<>(Toast.makeText(context, txt, duration));
-        Toast toast = sToastWRF.get();
-        toast.setText(txt);
-        toast.show();
+//        if (sToastWRF == null || sToastWRF.get() == null)
+//            sToastWRF = new WeakReference<>(Toast.makeText(context, txt, duration));
+//        Toast toast = sToastWRF.get();
+//        toast.setText(txt);
+//        toast.show();
+        Toast.makeText(context, txt, duration).show();
     }
 
     public static void mkdirs(String filePath) {
