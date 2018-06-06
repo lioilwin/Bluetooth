@@ -16,26 +16,28 @@ import android.bluetooth.le.AdvertiseSettings;
 import android.bluetooth.le.BluetoothLeAdvertiser;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.ParcelUuid;
+import android.os.SystemClock;
 import android.util.Log;
 import android.widget.TextView;
 
+import java.util.Arrays;
 import java.util.UUID;
 
 import win.lioil.bluetooth.R;
 import win.lioil.bluetooth.util.Util;
 
 /**
- * 作为BLE peripheral外围设备(GATT server服务端)
+ * BLE服务端(从机/外围设备/peripheral)
  */
 public class BleServerActivity extends Activity {
-    public static final UUID UUID_SERVICE = UUID.fromString("11111111-67d0-11e8-adc0-fa7ae01bbebc"); //自定义UUID
-    public static final UUID UUID_CHAR_READ = UUID.fromString("22222222-67d0-11e8-adc0-fa7ae01bbebc");
-    public static final UUID UUID_CHAR_WRITE = UUID.fromString("33333333-67d0-11e8-adc0-fa7ae01bbebc");
-    public static final UUID UUID_DESC = UUID.fromString("44444444-67d0-11e8-adc0-fa7ae01bbebc");
-
+    public static final UUID UUID_SERVICE = UUID.fromString("10000000-0000-0000-0000-000000000000"); //自定义UUID
+    public static final UUID UUID_CHAR_READ = UUID.fromString("11000000-0000-0000-0000-000000000000");
+    public static final UUID UUID_DESC = UUID.fromString("11100000-0000-0000-0000-000000000000");
+    public static final UUID UUID_CHAR_WRITE = UUID.fromString("12000000-0000-0000-0000-000000000000");
     private static final String TAG = BleServerActivity.class.getSimpleName();
     private TextView mTips;
-    public BluetoothLeAdvertiser mBluetoothLeAdvertiser; // BLE广播
+    private BluetoothLeAdvertiser mBluetoothLeAdvertiser; // BLE广播
     private BluetoothGattServer mBluetoothGattServer; // BLE服务端
 
     // BLE广播Callback
@@ -47,7 +49,7 @@ public class BleServerActivity extends Activity {
 
         @Override
         public void onStartFailure(int errorCode) {
-            logTv("BLE广播开启失败,errorCode:" + errorCode);
+            logTv("BLE广播开启失败,错误码:" + errorCode);
         }
     };
 
@@ -56,13 +58,13 @@ public class BleServerActivity extends Activity {
         @Override
         public void onConnectionStateChange(BluetoothDevice device, int status, int newState) {
             Log.i(TAG, String.format("onConnectionStateChange:%s,%s,%s,%s", device.getName(), device.getAddress(), status, newState));
-            logTv(newState == 2 ? "与" + device.getAddress() + "连接成功" : "与" + device.getAddress() + "连接断开");
+            logTv(String.format(status == 0 ? (newState == 2 ? "与[%s]连接成功" : "与[%s]连接断开") : ("与[%s]连接出错,错误码:" + status), device));
         }
 
         @Override
         public void onServiceAdded(int status, BluetoothGattService service) {
             Log.i(TAG, String.format("onServiceAdded:%s,%s", status, service.getUuid()));
-            logTv(status == 0 ? "服务添加成功,UUID=" + service.getUuid() : "服务添加失败,UUID=" + service.getUuid());
+            logTv(String.format(status == 0 ? "添加服务[%s]成功" : "添加服务[%s]失败,错误码:" + status, service.getUuid()));
         }
 
         @Override
@@ -70,7 +72,7 @@ public class BleServerActivity extends Activity {
             Log.i(TAG, String.format("onCharacteristicReadRequest:%s,%s,%s,%s,%s", device.getName(), device.getAddress(), requestId, offset, characteristic.getUuid()));
             String response = "CHAR_" + (int) (Math.random() * 100); //模拟数据
             mBluetoothGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, response.getBytes());// 响应客户端
-            logTv("客户端读取Characteristic: " + response);
+            logTv("客户端读取Characteristic[" + characteristic.getUuid() + "]:\n" + response);
         }
 
         @Override
@@ -80,7 +82,7 @@ public class BleServerActivity extends Activity {
             Log.i(TAG, String.format("onCharacteristicWriteRequest:%s,%s,%s,%s,%s,%s,%s,%s", device.getName(), device.getAddress(), requestId, characteristic.getUuid(),
                     preparedWrite, responseNeeded, offset, requestStr));
             mBluetoothGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, requestBytes);// 响应客户端
-            logTv("客户端写入Characteristic: " + requestStr);
+            logTv("客户端写入Characteristic[" + characteristic.getUuid() + "]:\n" + requestStr);
         }
 
         @Override
@@ -88,24 +90,32 @@ public class BleServerActivity extends Activity {
             Log.i(TAG, String.format("onDescriptorReadRequest:%s,%s,%s,%s,%s", device.getName(), device.getAddress(), requestId, offset, descriptor.getUuid()));
             String response = "DESC_" + (int) (Math.random() * 100); //模拟数据
             mBluetoothGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, response.getBytes()); // 响应客户端
-            logTv("客户端读取Descriptor: " + response);
+            logTv("客户端读取Descriptor[" + descriptor.getUuid() + "]:\n" + response);
         }
 
         @Override
-        public void onDescriptorWriteRequest(BluetoothDevice device, int requestId, BluetoothGattDescriptor descriptor, boolean preparedWrite, boolean responseNeeded, int offset, byte[] value) {
+        public void onDescriptorWriteRequest(final BluetoothDevice device, int requestId, BluetoothGattDescriptor descriptor, boolean preparedWrite, boolean responseNeeded, int offset, byte[] value) {
             // 获取客户端发过来的数据
-            String valueStr = new String(value);
+            String valueStr = Arrays.toString(value);
             Log.i(TAG, String.format("onDescriptorWriteRequest:%s,%s,%s,%s,%s,%s,%s,%s", device.getName(), device.getAddress(), requestId, descriptor.getUuid(),
                     preparedWrite, responseNeeded, offset, valueStr));
             mBluetoothGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, value);// 响应客户端
-            logTv("客户端写入Descriptor: " + valueStr);
+            logTv("客户端写入Descriptor[" + descriptor.getUuid() + "]:\n" + valueStr);
 
             // 通知客户端Characteristic变化(简单模拟，实际上应该用List保存客户端设备，以后真的变化再逐一通知)
-            BluetoothGattCharacteristic characteristic = descriptor.getCharacteristic();
-            String response = "CHAR_" + (int) (Math.random() * 100); //模拟数据
-            characteristic.setValue(response);
-            mBluetoothGattServer.notifyCharacteristicChanged(device, characteristic, false);
-            logTv("通知客户端Characteristic改变: " + response);
+            final BluetoothGattCharacteristic characteristic = descriptor.getCharacteristic();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    for (int i = 0; i < 5; i++) {
+                        String response = "CHAR_" + (int) (Math.random() * 100); //模拟数据
+                        characteristic.setValue(response);
+                        mBluetoothGattServer.notifyCharacteristicChanged(device, characteristic, false);
+                        logTv("通知客户端改变Characteristic[" + characteristic.getUuid() + "]:\n" + response);
+                        SystemClock.sleep(1000);
+                    }
+                }
+            });
         }
 
         @Override
@@ -134,23 +144,28 @@ public class BleServerActivity extends Activity {
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         // ============启动BLE蓝牙广播(广告) =================================================================================
-        //广播设置
+        //广播设置(必须)
         AdvertiseSettings settings = new AdvertiseSettings.Builder()
-                .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY) //低延迟
-                .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_HIGH) //高信号强度
-                .setConnectable(true) //能否连接
+                .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_BALANCED) //广播模式: 低功耗,平衡,低延迟
+                .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM) //发射功率级别: 极低,低,中,高
+                .setConnectable(true) //能否连接,广播分为可连接广播和不可连接广播
                 .build();
-        //广播数据
+        //广播数据(必须，广播启动就会发送)
         AdvertiseData advertiseData = new AdvertiseData.Builder()
-                .addManufacturerData(666, new byte[]{23, 33}) //设备厂商数据，自定义
-//                .addServiceData(new ParcelUuid(UUID_SERVICE), new byte[]{16, 17}) //服务数据，自定义
-                .setIncludeDeviceName(true)
-                .setIncludeTxPowerLevel(true)
+                .setIncludeDeviceName(true) //包含蓝牙名称
+                .setIncludeTxPowerLevel(true) //包含发射功率级别
+                .addManufacturerData(1, new byte[]{23, 33}) //设备厂商数据，自定义
+                .build();
+        //扫描响应数据(可选，当客户端扫描时才发送)
+        AdvertiseData scanResponse = new AdvertiseData.Builder()
+                .addManufacturerData(2, new byte[]{66, 66}) //设备厂商数据，自定义
+                .addServiceUuid(new ParcelUuid(UUID_SERVICE)) //服务UUID
+//                .addServiceData(new ParcelUuid(UUID_SERVICE), new byte[]{2}) //服务数据，自定义
                 .build();
         mBluetoothLeAdvertiser = bluetoothAdapter.getBluetoothLeAdvertiser();
-        mBluetoothLeAdvertiser.startAdvertising(settings, advertiseData, advertiseData, mAdvertiseCallback);
+        mBluetoothLeAdvertiser.startAdvertising(settings, advertiseData, scanResponse, mAdvertiseCallback);
 
-        // 必须要开启BLE广播，其它设备才能扫描发现本设备BLE服务!
+        // 注意：必须要开启可连接的BLE广播，其它设备才能发现并连接BLE服务端!
         // =============启动蓝牙服务端=====================================================================================
         BluetoothGattService service = new BluetoothGattService(UUID_SERVICE, BluetoothGattService.SERVICE_TYPE_PRIMARY);
         //添加可读+通知characteristic
@@ -168,17 +183,12 @@ public class BleServerActivity extends Activity {
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mBluetoothGattServer != null)
-            mBluetoothGattServer.close();
         if (mBluetoothLeAdvertiser != null)
             mBluetoothLeAdvertiser.stopAdvertising(mAdvertiseCallback);
+        if (mBluetoothGattServer != null)
+            mBluetoothGattServer.close();
     }
 
     private void logTv(final String msg) {
