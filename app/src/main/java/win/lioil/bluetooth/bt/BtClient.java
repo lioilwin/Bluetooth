@@ -9,7 +9,7 @@ import win.lioil.bluetooth.util.Util;
  * 客户端，与服务端建立长连接
  */
 public class BtClient extends BtBase {
-    public BtClient(Listener listener) {
+    BtClient(Listener listener) {
         super(listener);
     }
 
@@ -21,8 +21,8 @@ public class BtClient extends BtBase {
     public void connect(BluetoothDevice dev) {
         close();
         try {
-            // final BluetoothSocket socket = dev.createRfcommSocketToServiceRecord(SPP_UUID); //加密传输，会自动执行配对(系统UI弹出配对码)
-            final BluetoothSocket socket = dev.createInsecureRfcommSocketToServiceRecord(SPP_UUID); //明文传输，无需配对
+//             final BluetoothSocket socket = dev.createRfcommSocketToServiceRecord(SPP_UUID); //加密传输，Android系统强制配对，弹窗显示配对码
+            final BluetoothSocket socket = dev.createInsecureRfcommSocketToServiceRecord(SPP_UUID); //明文传输(不安全)，无需配对
             // 开启子线程
             Util.EXECUTOR.execute(new Runnable() {
                 @Override

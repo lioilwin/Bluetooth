@@ -15,14 +15,14 @@ import java.io.File;
 
 import win.lioil.bluetooth.R;
 import win.lioil.bluetooth.util.Util;
-import win.lioil.bluetooth.util.BluetoothReceiver;
+import win.lioil.bluetooth.util.BtReceiver;
 
-public class BtClientActivity extends Activity implements BtBase.Listener, BluetoothReceiver.Listener, BtDevAdapter.Listener {
+public class BtClientActivity extends Activity implements BtBase.Listener, BtReceiver.Listener, BtDevAdapter.Listener {
     private TextView mTips;
     private EditText mInputMsg;
     private EditText mInputFile;
     private TextView mLogs;
-    private BluetoothReceiver mBluetoothReceiver;
+    private BtReceiver mBtReceiver;
     private final BtDevAdapter mBtDevAdapter = new BtDevAdapter(this);
     private final BtClient mClient = new BtClient(this);
 
@@ -37,22 +37,25 @@ public class BtClientActivity extends Activity implements BtBase.Listener, Bluet
         mInputMsg = findViewById(R.id.input_msg);
         mInputFile = findViewById(R.id.input_file);
         mLogs = findViewById(R.id.tv_log);
-        mBluetoothReceiver = new BluetoothReceiver(this, this);//注册蓝牙广播
+        mBtReceiver = new BtReceiver(this, this);//注册蓝牙广播
         BluetoothAdapter.getDefaultAdapter().startDiscovery();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(mBluetoothReceiver);
+        unregisterReceiver(mBtReceiver);
         mClient.close();
     }
 
     @Override
     public void onItemClick(BluetoothDevice dev) {
-        if (mClient.isConnected(dev))
+        if (mClient.isConnected(dev)) {
+            Util.toast(this, "已经连接了");
             return;
+        }
         mClient.connect(dev);
+        Util.toast(this, "正在连接...");
         mTips.setText("正在连接...");
     }
 

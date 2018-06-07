@@ -13,7 +13,7 @@ public class BtServer extends BtBase {
     private static final String TAG = BtServer.class.getSimpleName();
     private BluetoothServerSocket mSSocket;
 
-    public BtServer(Listener listener) {
+    BtServer(Listener listener) {
         super(listener);
         listen();
     }
@@ -24,8 +24,8 @@ public class BtServer extends BtBase {
     public void listen() {
         try {
             BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-//            mSSocket = adapter.listenUsingRfcommWithServiceRecord(TAG, SPP_UUID); //加密传输，会自动执行配对
-            mSSocket = adapter.listenUsingInsecureRfcommWithServiceRecord(TAG, SPP_UUID); //明文传输，无需配对
+//            mSSocket = adapter.listenUsingRfcommWithServiceRecord(TAG, SPP_UUID); //加密传输，Android强制执行配对，弹窗显示配对码
+            mSSocket = adapter.listenUsingInsecureRfcommWithServiceRecord(TAG, SPP_UUID); //明文传输(不安全)，无需配对
             // 开启子线程
             Util.EXECUTOR.execute(new Runnable() {
                 @Override
