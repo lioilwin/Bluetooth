@@ -168,7 +168,7 @@ public class BleServerActivity extends Activity {
         mBluetoothLeAdvertiser.startAdvertising(settings, advertiseData, scanResponse, mAdvertiseCallback);
 
         // 注意：必须要开启可连接的BLE广播，其它设备才能发现并连接BLE服务端!
-        // =============启动蓝牙服务端=====================================================================================
+        // =============启动BLE蓝牙服务端=====================================================================================
         BluetoothGattService service = new BluetoothGattService(UUID_SERVICE, BluetoothGattService.SERVICE_TYPE_PRIMARY);
         //添加可读+通知characteristic
         BluetoothGattCharacteristic characteristicRead = new BluetoothGattCharacteristic(UUID_CHAR_READ_NOTIFY,

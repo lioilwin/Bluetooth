@@ -150,7 +150,8 @@ public class BleClientActivity extends Activity {
             mBleDevAdapter.reScan();
     }
 
-    // 读取数据->onCharacteristicRead
+    // 注意：连续频繁读写数据容易失败，读写操作间隔最好200ms以上，或等待上次回调完成后再进行下次读写操作！
+    // 读取数据成功会回调->onCharacteristicChanged()
     public void read(View view) {
         BluetoothGattService service = getGattService(BleServerActivity.UUID_SERVICE);
         if (service != null) {
@@ -159,7 +160,8 @@ public class BleClientActivity extends Activity {
         }
     }
 
-    // 写入数据->onCharacteristicWrite
+    // 注意：连续频繁读写数据容易失败，读写操作间隔最好200ms以上，或等待上次回调完成后再进行下次读写操作！
+    // 写入数据成功会回调->onCharacteristicWrite()
     public void write(View view) {
         BluetoothGattService service = getGattService(BleServerActivity.UUID_SERVICE);
         if (service != null) {
@@ -170,7 +172,7 @@ public class BleClientActivity extends Activity {
         }
     }
 
-    // 设置通知Characteristic->onCharacteristicChanged
+    // 设置通知Characteristic变化会回调->onCharacteristicChanged()
     public void setNotify(View view) {
         BluetoothGattService service = getGattService(BleServerActivity.UUID_SERVICE);
         if (service != null) {
@@ -180,7 +182,7 @@ public class BleClientActivity extends Activity {
 
             // 向Characteristic的Descriptor属性写入通知开关，使蓝牙设备主动向手机发送数据
             BluetoothGattDescriptor descriptor = characteristic.getDescriptor(BleServerActivity.UUID_DESC_NOTITY);
-            // descriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
+            // descriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);//和通知类似,但服务端不主动发数据,只指示客户端读取数据
             descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
             mBluetoothGatt.writeDescriptor(descriptor);
         }
