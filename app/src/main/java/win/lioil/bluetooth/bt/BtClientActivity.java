@@ -45,6 +45,7 @@ public class BtClientActivity extends Activity implements BtBase.Listener, BtRec
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(mBtReceiver);
+        mClient.unListener();
         mClient.close();
     }
 

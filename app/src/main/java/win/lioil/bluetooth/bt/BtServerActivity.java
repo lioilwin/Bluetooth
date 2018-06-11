@@ -34,6 +34,7 @@ public class BtServerActivity extends Activity implements BtBase.Listener {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mServer.unListener();
         mServer.close();
     }
 

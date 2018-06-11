@@ -126,6 +126,13 @@ public class BtBase {
     }
 
     /**
+     * 释放监听引用(例如释放对Activity引用，避免内存泄漏)
+     */
+    public void unListener() {
+        mListener = null;
+    }
+
+    /**
      * 关闭Socket连接
      */
     public void close() {
@@ -154,7 +161,8 @@ public class BtBase {
             @Override
             public void run() {
                 try {
-                    mListener.socketNotify(state, obj);
+                    if (mListener != null)
+                        mListener.socketNotify(state, obj);
                 } catch (Throwable e) {
                     e.printStackTrace();
                 }
