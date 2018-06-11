@@ -13,7 +13,6 @@ import win.lioil.bluetooth.ble.BleClientActivity;
 import win.lioil.bluetooth.ble.BleServerActivity;
 import win.lioil.bluetooth.bt.BtClientActivity;
 import win.lioil.bluetooth.bt.BtServerActivity;
-import win.lioil.bluetooth.util.Util;
 
 public class MainActivity extends Activity {
 
@@ -25,7 +24,7 @@ public class MainActivity extends Activity {
         // 检查蓝牙开关
         BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
         if (adapter == null) {
-            Util.toast(this, "本机没有找到蓝牙硬件或驱动！");
+            APP.toast("本机没有找到蓝牙硬件或驱动！", 0);
             finish();
             return;
         } else {
@@ -39,7 +38,7 @@ public class MainActivity extends Activity {
 
         // 检查是否支持BLE蓝牙
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-            Util.toast(this, "本机不支持低功耗蓝牙！");
+            APP.toast("本机不支持低功耗蓝牙！", 0);
             finish();
             return;
         }

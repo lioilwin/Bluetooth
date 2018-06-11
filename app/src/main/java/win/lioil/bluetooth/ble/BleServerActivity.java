@@ -24,8 +24,8 @@ import android.widget.TextView;
 import java.util.Arrays;
 import java.util.UUID;
 
+import win.lioil.bluetooth.APP;
 import win.lioil.bluetooth.R;
-import win.lioil.bluetooth.util.Util;
 
 /**
  * BLE服务端(从机/外围设备/peripheral)
@@ -199,7 +199,7 @@ public class BleServerActivity extends Activity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Util.toast(BleServerActivity.this, msg);
+                APP.toast(msg, 0);
                 mTips.append(msg + "\n\n");
             }
         });

@@ -13,8 +13,8 @@ import android.widget.TextView;
 
 import java.io.File;
 
+import win.lioil.bluetooth.APP;
 import win.lioil.bluetooth.R;
-import win.lioil.bluetooth.util.Util;
 import win.lioil.bluetooth.util.BtReceiver;
 
 public class BtClientActivity extends Activity implements BtBase.Listener, BtReceiver.Listener, BtDevAdapter.Listener {
@@ -52,11 +52,11 @@ public class BtClientActivity extends Activity implements BtBase.Listener, BtRec
     @Override
     public void onItemClick(BluetoothDevice dev) {
         if (mClient.isConnected(dev)) {
-            Util.toast(this, "已经连接了");
+            APP.toast("已经连接了", 0);
             return;
         }
         mClient.connect(dev);
-        Util.toast(this, "正在连接...");
+        APP.toast("正在连接...", 0);
         mTips.setText("正在连接...");
     }
 
@@ -74,22 +74,22 @@ public class BtClientActivity extends Activity implements BtBase.Listener, BtRec
         if (mClient.isConnected(null)) {
             String msg = mInputMsg.getText().toString();
             if (TextUtils.isEmpty(msg))
-                Util.toast(this, "消息不能空");
+                APP.toast("消息不能空", 0);
             else
                 mClient.sendMsg(msg);
         } else
-            Util.toast(this, "没有连接");
+            APP.toast("没有连接", 0);
     }
 
     public void sendFile(View view) {
         if (mClient.isConnected(null)) {
             String filePath = mInputFile.getText().toString();
             if (TextUtils.isEmpty(filePath) || !new File(filePath).exists())
-                Util.toast(this, "文件无效");
+                APP.toast("文件无效", 0);
             else
                 mClient.sendFile(filePath);
         } else
-            Util.toast(this, "没有连接");
+            APP.toast("没有连接", 0);
     }
 
     @Override
@@ -112,6 +112,6 @@ public class BtClientActivity extends Activity implements BtBase.Listener, BtRec
                 mLogs.append(msg);
                 break;
         }
-        Util.toast(this, msg);
+        APP.toast(msg, 0);
     }
 }

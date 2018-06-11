@@ -19,8 +19,8 @@ import android.widget.TextView;
 import java.util.Arrays;
 import java.util.UUID;
 
+import win.lioil.bluetooth.APP;
 import win.lioil.bluetooth.R;
-import win.lioil.bluetooth.util.Util;
 
 /**
  * BLE客户端(主机/中心设备/Central)
@@ -145,7 +145,7 @@ public class BleClientActivity extends Activity {
     // 扫描BLE
     public void reScan(View view) {
         if (mBleDevAdapter.isScanning)
-            Util.toast(this, "正在扫描...");
+            APP.toast("正在扫描...", 0);
         else
             mBleDevAdapter.reScan();
     }
@@ -191,12 +191,12 @@ public class BleClientActivity extends Activity {
     // 获取Gatt服务
     private BluetoothGattService getGattService(UUID uuid) {
         if (!isConnected) {
-            Util.toast(this, "没有连接");
+            APP.toast("没有连接", 0);
             return null;
         }
         BluetoothGattService service = mBluetoothGatt.getService(uuid);
         if (service == null)
-            Util.toast(this, "没有找到服务UUID=" + uuid);
+            APP.toast("没有找到服务UUID=" + uuid, 0);
         return service;
     }
 
@@ -207,7 +207,7 @@ public class BleClientActivity extends Activity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Util.toast(BleClientActivity.this, msg);
+                APP.toast(msg, 0);
                 mTips.append(msg + "\n\n");
             }
         });

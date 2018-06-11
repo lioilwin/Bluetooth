@@ -12,7 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.UUID;
 
-import win.lioil.bluetooth.MainAPP;
+import win.lioil.bluetooth.APP;
 import win.lioil.bluetooth.util.Util;
 
 /**
@@ -157,7 +157,7 @@ public class BtBase {
 
     // ============================================通知UI===========================================================
     private void notifyUI(final int state, final Object obj) {
-        MainAPP.runUi(new Runnable() {
+        APP.runUi(new Runnable() {
             @Override
             public void run() {
                 try {

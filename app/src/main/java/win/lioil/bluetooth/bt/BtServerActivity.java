@@ -10,8 +10,8 @@ import android.widget.TextView;
 
 import java.io.File;
 
+import win.lioil.bluetooth.APP;
 import win.lioil.bluetooth.R;
-import win.lioil.bluetooth.util.Util;
 
 public class BtServerActivity extends Activity implements BtBase.Listener {
     private TextView mTips;
@@ -42,22 +42,22 @@ public class BtServerActivity extends Activity implements BtBase.Listener {
         if (mServer.isConnected(null)) {
             String msg = mInputMsg.getText().toString();
             if (TextUtils.isEmpty(msg))
-                Util.toast(this, "消息不能空");
+                APP.toast("消息不能空", 0);
             else
                 mServer.sendMsg(msg);
         } else
-            Util.toast(this, "没有连接");
+            APP.toast("没有连接", 0);
     }
 
     public void sendFile(View view) {
         if (mServer.isConnected(null)) {
             String filePath = mInputFile.getText().toString();
             if (TextUtils.isEmpty(filePath) || !new File(filePath).exists())
-                Util.toast(this, "文件无效");
+                APP.toast("文件无效", 0);
             else
                 mServer.sendFile(filePath);
         } else
-            Util.toast(this, "没有连接");
+            APP.toast("没有连接", 0);
     }
 
     @Override
@@ -81,6 +81,6 @@ public class BtServerActivity extends Activity implements BtBase.Listener {
                 mLogs.append(msg);
                 break;
         }
-        Util.toast(this, msg);
+        APP.toast(msg, 0);
     }
 }
