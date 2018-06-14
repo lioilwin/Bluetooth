@@ -87,6 +87,7 @@ public class BtBase {
         try {
             mOut.writeInt(FLAG_MSG); //消息标记
             mOut.writeUTF(msg);
+            mOut.flush();
         } catch (Throwable e) {
             close();
         }
@@ -113,9 +114,9 @@ public class BtBase {
                     mOut.writeLong(file.length()); //文件长度
                     int r;
                     byte[] b = new byte[4 * 1024];
-                    while ((r = in.read(b)) != -1) {
+                    while ((r = in.read(b)) != -1)
                         mOut.write(b, 0, r);
-                    }
+                    mOut.flush();
                     notifyUI(Listener.MSG, "文件发送完成.");
                 } catch (Throwable e) {
                     close();
