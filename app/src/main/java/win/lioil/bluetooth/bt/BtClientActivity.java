@@ -84,7 +84,7 @@ public class BtClientActivity extends Activity implements BtBase.Listener, BtRec
     public void sendFile(View view) {
         if (mClient.isConnected(null)) {
             String filePath = mInputFile.getText().toString();
-            if (TextUtils.isEmpty(filePath) || !new File(filePath).exists())
+            if (TextUtils.isEmpty(filePath) || !new File(filePath).isFile())
                 APP.toast("文件无效", 0);
             else
                 mClient.sendFile(filePath);

@@ -3,7 +3,6 @@ package win.lioil.bluetooth.bt;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.os.Environment;
-import android.text.TextUtils;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -56,12 +55,12 @@ public class BtBase {
                         Util.mkdirs(FILE_PATH);
                         String fileName = in.readUTF(); //文件名
                         long fileLen = in.readLong(); //文件长度
-                        notifyUI(Listener.MSG, "正在接收文件(" + fileName + ")····················");
                         // 读取文件内容
                         long len = 0;
                         int r;
                         byte[] b = new byte[4 * 1024];
                         FileOutputStream out = new FileOutputStream(FILE_PATH + fileName);
+                        notifyUI(Listener.MSG, "正在接收文件(" + fileName + "),请稍后...");
                         while ((r = in.read(b)) != -1) {
                             out.write(b, 0, r);
                             len += r;
@@ -81,17 +80,16 @@ public class BtBase {
      * 发送短消息
      */
     public void sendMsg(String msg) {
-        if (isSending || TextUtils.isEmpty(msg))
-            return;
+        if (checkSend()) return;
         isSending = true;
         try {
             mOut.writeInt(FLAG_MSG); //消息标记
             mOut.writeUTF(msg);
             mOut.flush();
+            notifyUI(Listener.MSG, "发送短消息：" + msg);
         } catch (Throwable e) {
             close();
         }
-        notifyUI(Listener.MSG, "发送短消息：" + msg);
         isSending = false;
     }
 
@@ -99,14 +97,12 @@ public class BtBase {
      * 发送文件
      */
     public void sendFile(final String filePath) {
-        if (isSending || TextUtils.isEmpty(filePath))
-            return;
+        if (checkSend()) return;
         isSending = true;
         Util.EXECUTOR.execute(new Runnable() {
             @Override
             public void run() {
                 try {
-                    notifyUI(Listener.MSG, "正在发送文件(" + filePath + ")····················");
                     FileInputStream in = new FileInputStream(filePath);
                     File file = new File(filePath);
                     mOut.writeInt(FLAG_FILE); //文件标记
@@ -114,6 +110,7 @@ public class BtBase {
                     mOut.writeLong(file.length()); //文件长度
                     int r;
                     byte[] b = new byte[4 * 1024];
+                    notifyUI(Listener.MSG, "正在发送文件(" + filePath + "),请稍后...");
                     while ((r = in.read(b)) != -1)
                         mOut.write(b, 0, r);
                     mOut.flush();
@@ -157,6 +154,14 @@ public class BtBase {
     }
 
     // ============================================通知UI===========================================================
+    private boolean checkSend() {
+        if (isSending) {
+            APP.toast("正在发送其它数据,请稍后再发...", 0);
+            return true;
+        }
+        return false;
+    }
+
     private void notifyUI(final int state, final Object obj) {
         APP.runUi(new Runnable() {
             @Override
